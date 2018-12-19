@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,31 +19,49 @@ import com.example.chars.photocollection.data.PhotoItem;
 import java.util.ArrayList;
 import java.util.List;
 
-public class photoCollectionFragment extends Fragment {
+public class photoCollectionFragment extends Fragment implements
+        LoaderManager.LoaderCallbacks<List<PhotoItem>> {
     private static final String TAG = "PhotoCollectionFragment";
     private RecyclerView photoRecyclerView;
     private List<PhotoItem> items = new ArrayList<>();
 
-    private class FetchItemTask extends AsyncTask<Void, Void, List<PhotoItem>> {
-
-        @Override
-        protected List<PhotoItem> doInBackground(Void... voids) {
-//            try {
-//                String result = new FlickrFetchr().getUrlString("https://www.baidu.com");
-//                Log.i(TAG,"Fetched contents of URL: " + result);
-//            } catch (IOException e) {
-//                Log.e(TAG,"Failed to fecth URL.");
-//            }
-            return new FlickrFetchr().fetchItems();
-        }
-
-        @Override
-        protected void onPostExecute(List<PhotoItem> photoItems) {
-            super.onPostExecute(photoItems);
-            items = photoItems;
-            setupAdapter();
-        }
+    @NonNull
+    @Override
+    public Loader onCreateLoader(int i, @Nullable Bundle bundle) {
+        return new AsyncLoaderPhoto(getActivity());
     }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<List<PhotoItem>> loader, List<PhotoItem> photoitems) {
+        items = photoitems;
+        setupAdapter();
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader loader) {
+        items = null;
+    }
+
+//    private class FetchItemTask extends AsyncTask<Void, Void, List<PhotoItem>> {
+//
+//        @Override
+//        protected List<PhotoItem> doInBackground(Void... voids) {
+////            try {
+////                String result = new FlickrFetchr().getUrlString("https://www.baidu.com");
+////                Log.i(TAG,"Fetched contents of URL: " + result);
+////            } catch (IOException e) {
+////                Log.e(TAG,"Failed to fecth URL.");
+////            }
+//            return new FlickrFetchr().fetchItems();
+//        }
+//
+//        @Override
+//        protected void onPostExecute(List<PhotoItem> photoItems) {
+//            super.onPostExecute(photoItems);
+//            items = photoItems;
+//            setupAdapter();
+//        }
+//    }
 
     public static photoCollectionFragment newInstance() {
         return new photoCollectionFragment();
@@ -51,7 +71,8 @@ public class photoCollectionFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        new FetchItemTask().execute();
+//        new FetchItemTask().execute();
+        LoaderManager.getInstance(this).initLoader(1,null,this).forceLoad();
     }
 
     @Nullable
