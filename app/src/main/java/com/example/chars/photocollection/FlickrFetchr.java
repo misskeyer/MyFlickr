@@ -4,6 +4,8 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.example.chars.photocollection.data.PhotoItem;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -62,9 +64,12 @@ public class FlickrFetchr {
             Log.i(TAG,"Received Json: " + jsonString);
             JSONObject jsonBody = new JSONObject(jsonString);
             parseItems(items, jsonBody);
+//            Gson gson = new Gson();
+//            items = gson.fromJson(jsonString, new TypeToken<List<PhotoItem>>(){}.getType());
         } catch (IOException e) {
             Log.e(TAG,"Failed to fetch items");
-        } catch (JSONException e) {
+        }
+        catch (JSONException e) {
             Log.e(TAG,"Failed to parse Json.");
         }
         return items;
