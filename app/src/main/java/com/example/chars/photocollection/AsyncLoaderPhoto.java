@@ -14,7 +14,8 @@ public class AsyncLoaderPhoto extends AsyncTaskLoader {
     @Nullable
     @Override
     public Object loadInBackground() {
-        return new FlickrFetchr().fetchItems();
+        return null;
+//        return new FlickrFetchr().fetchItems();
     }
 
 }
