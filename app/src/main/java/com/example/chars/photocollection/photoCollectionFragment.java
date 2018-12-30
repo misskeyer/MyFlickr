@@ -1,5 +1,6 @@
 package com.example.chars.photocollection;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -27,6 +28,7 @@ import com.example.chars.photocollection.data.PhotoItem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class photoCollectionFragment extends Fragment {
     private static final String TAG = "PhotoCollectionFragment";
@@ -117,6 +119,12 @@ public class photoCollectionFragment extends Fragment {
                 searchView.setQuery(query, false);
             }
         });
+
+        MenuItem toggleItem = menu.findItem(R.id.menu_item_toggle_polling);
+        if (PollService.isServiceAlarmOn(getActivity()))
+            toggleItem.setTitle(R.string.stop_polling);
+        else
+            toggleItem.setTitle(R.string.start_polling);
     }
 
     @Override
@@ -126,8 +134,13 @@ public class photoCollectionFragment extends Fragment {
                 QueryPreferences.setStoredQuery(getActivity(), null);
                 updateItems();
                 return true;
+            case R.id.menu_item_toggle_polling:
+                boolean shouldStartAlarm = !PollService.isServiceAlarmOn(getActivity());
+                PollService.setServiceAlarm(getActivity(), shouldStartAlarm);
+                Objects.requireNonNull(getActivity()).invalidateOptionsMenu();
+                return true;
             default:
-            return super.onOptionsItemSelected(item);
+                return super.onOptionsItemSelected(item);
         }
     }
 

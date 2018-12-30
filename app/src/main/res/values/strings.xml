@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">PhotoCollection</string>
     <string name="search">Search</string>
-    <string name="clear_search">Clear History</string>
+    <string name="clear_search">Clear history</string>
+    <string name="start_polling">Start polling</string>
+    <string name="stop_polling">Stop polling</string>
+    <string name="new_photos_title">New photos</string>
+    <string name="new_photos_text">You have new photos here!</string>
 </resources>
