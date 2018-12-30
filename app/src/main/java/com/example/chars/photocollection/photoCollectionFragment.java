@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class photoCollectionFragment extends Fragment {
+public class photoCollectionFragment extends VisibleFragment {
     private static final String TAG = "PhotoCollectionFragment";
     private RecyclerView photoRecyclerView;
     private List<PhotoItem> items = new ArrayList<>();

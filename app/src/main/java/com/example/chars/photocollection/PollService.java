@@ -1,6 +1,7 @@
 package com.example.chars.photocollection;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.Notification;
@@ -26,6 +27,11 @@ public class PollService extends IntentService {
     private static final String CHANNEL_ID = "channel_pollservice";
     private static final int POLL_INTERVAL = 1000 * 60;
 
+    public static final String ACTION_SHOW_NOTIFICATION = "com.example.chars.photocollection.show_notification";
+    public static final String PERM_PRIVATE = "com.example.chars.photocollection.private";
+    public static final String REQUEST_CODE = "REQUEST_CODE";
+    public static final String NOTIFICATION = "NOTIFICATION";
+
     public PollService() {
         super(TAG);
     }
@@ -48,6 +54,8 @@ public class PollService extends IntentService {
             alarmManager.cancel(pi);
             pi.cancel();
         }
+
+        QueryPreferences.setAlarmOn(context, isOn);
     }
 
     public static boolean isServiceAlarmOn(Context context) {
@@ -111,9 +119,20 @@ public class PollService extends IntentService {
                         .build();
             }
 
-            manager.notify(0, notification);
+//            manager.notify(0, notification);
+//            sendBroadcast(new Intent(ACTION_SHOW_NOTIFICATION), PERM_PRIVATE);
+            showBackgroundNotification(1, notification);
         }
         QueryPreferences.setLastResultId(this, resultId);
+    }
+
+    private void showBackgroundNotification(int requestCode, Notification notification) {
+        Log.i(TAG,"sendOrderedBroadcast.");
+        Intent i = new Intent(ACTION_SHOW_NOTIFICATION);
+        i.putExtra(REQUEST_CODE, requestCode);
+        i.putExtra(NOTIFICATION, notification);
+        sendOrderedBroadcast(i, PERM_PRIVATE, null, null,
+                Activity.RESULT_OK, null, null);
     }
 
     private boolean isNetworkAvailableAndConnected() {
