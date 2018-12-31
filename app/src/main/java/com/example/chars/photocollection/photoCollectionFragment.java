@@ -193,10 +193,23 @@ public class photoCollectionFragment extends VisibleFragment {
 
     private class PhotoHolder extends RecyclerView.ViewHolder {
         private ImageView itemImage;
+        private PhotoItem photoItem;
 
         public PhotoHolder(@NonNull View itemView) {
             super(itemView);
             itemImage = itemView.findViewById(R.id.fragment_photo_collection_image_view);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = PhotoPageActivity
+                            .newIntent(getActivity(), photoItem.getPhotoPageUri());
+                    startActivity(i);
+                }
+            });
+        }
+
+        public void bindPhotoItem(PhotoItem item) {
+            photoItem = item;
         }
 
         public void bindPhoto(Drawable drawable) {
@@ -224,6 +237,7 @@ public class photoCollectionFragment extends VisibleFragment {
             PhotoItem item = photoItems.get(i);
             Drawable placeHolder = getResources().getDrawable(R.drawable.ic_launcher_background);
             photoHolder.bindPhoto(placeHolder);
+            photoHolder.bindPhotoItem(item);
             thumbnailDownloader.queueThumbnail(photoHolder, item.getUrl());
         }
 
