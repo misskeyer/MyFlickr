@@ -4,8 +4,14 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.example.chars.photocollection.data.PhotoItem;
+import com.example.chars.photocollection.data.ResultPhotos;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,6 +20,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -44,14 +51,16 @@ public class FlickrFetchr {
         try {
             String jsonString = getUrlString(url);
             Log.i(TAG,"Received Json: " + jsonString);
-            JSONObject jsonBody = new JSONObject(jsonString);
-            parseItems(items, jsonBody);
+//            JSONObject jsonBody = new JSONObject(jsonString);
+//            parseItems(items, jsonBody);
+            parseItemsWhitGson(jsonString, items);
         } catch (IOException e) {
             Log.e(TAG,"Failed to fetch items");
         }
-        catch (JSONException e) {
-            Log.e(TAG,"Failed to parse Json.");
-        }
+//        catch (JSONException e) {
+//            Log.e(TAG,"Failed to parse Json.");
+//        }
+        Log.i(TAG,"Items after : " + items);
         return items;
     }
 
@@ -97,7 +106,6 @@ public class FlickrFetchr {
         JSONArray photoJsonArray = photosJsonObject.getJSONArray("photo");
         for (int i = 0; i < photoJsonArray.length(); i++){
             JSONObject photoJsonObject = photoJsonArray.getJSONObject(i);
-
             PhotoItem item = new PhotoItem();
             item.setId(photoJsonObject.getString("id"));
             item.setCaption(photoJsonObject.getString("title"));
@@ -109,6 +117,112 @@ public class FlickrFetchr {
             item.setOwner(photoJsonObject.getString("owner"));
             items.add(item);
         }
+    }
+
+    public void parseItemsWhitGson(String json, List<PhotoItem> items) throws IOException {
+        Log.i(TAG,"parseItemWhitGson.");
+//        List<PhotoItem> pItems = new ArrayList<>();
+
+//        JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
+//        JsonArray jsonArray = jsonObject.getAsJsonArray("photo");
+//        Log.i(TAG,"jsonObject:" + jsonObject);
+//        Log.i(TAG,"jsonArray:" + jsonArray);
+//        List<ResultPhotos.photo> photos = new Gson().fromJson(jsonArray,
+//                new TypeToken<List<ResultPhotos.photo>>(){}.getType());
+//        ResultPhotos resultPhotos = new Gson().fromJson(json, ResultPhotos.class);
+//        List<ResultPhotos.photo> photos = resultPhotos.photos;
+        JsonReader reader = new JsonReader(new StringReader(json));
+        try {
+            reader.beginObject();
+            while (reader.hasNext()) {
+                String propertyName = reader.nextName();
+                if (propertyName.equals("photos")) {
+                    readPhotos(reader, items);
+                } else {
+                    reader.skipValue();
+                }
+            }
+            reader.endObject();
+        } finally {
+            reader.close();
+        }
+
+
+//        for (ResultPhotos.photo item : photos) {
+//            PhotoItem photoItem = new PhotoItem();
+//            photoItem.setCaption(item.title);
+//            photoItem.setId(String.valueOf(item.id));
+//            photoItem.setUrl(item.url_s);
+//            photoItem.setOwner(item.owner);
+//            pItems.add(photoItem);
+//        }
+
+//        for (JsonElement element :jsonArray) {
+//            ResultPhotos.photo photo = new Gson().fromJson(element,
+//                    new TypeToken<ResultPhotos.photo>(){}.getType());
+//            PhotoItem photoItem = new PhotoItem();
+//            photoItem.setCaption(photo.title);
+//            photoItem.setId(String.valueOf(photo.id));
+//            photoItem.setUrl(photo.url_s);
+//            photoItem.setOwner(photo.owner);
+//            pItems.add(photoItem);
+//        }
+
+//        return pItems;
+    }
+
+    private void readPhotos(JsonReader reader, List<PhotoItem> items) throws IOException {
+        reader.beginObject();
+        List<PhotoItem> pItems = new ArrayList<>();
+        while (reader.hasNext()) {
+            String propertyName = reader.nextName();
+            if (propertyName.equals("photo")) {
+               readPhoto(reader, items);
+            } else {
+                reader.skipValue();
+            }
+        }
+        reader.endObject();
+//        return pItems;
+    }
+
+    private void readPhoto(JsonReader reader, List<PhotoItem> items)  throws IOException {
+        reader.beginArray();
+        String id = null,url_s = null,owner = null,title = null;
+//        List<PhotoItem> items = new ArrayList<>();
+        while (reader.hasNext()) {
+            PhotoItem item = new PhotoItem();
+            reader.beginObject();
+            while (reader.hasNext()) {
+                String propertyName = reader.nextName();
+                switch (propertyName) {
+                    case "id":
+                        id = reader.nextString();
+                        break;
+                    case "url_s":
+                        url_s = reader.nextString();
+                        break;
+                    case "owner":
+                        owner = reader.nextString();
+                        break;
+                    case "title":
+                        title = reader.nextString();
+                        break;
+                    default:
+                        reader.skipValue();
+                        break;
+                }
+            }
+                item.setId(id);
+                item.setUrl(url_s);
+                item.setOwner(owner);
+                item.setCaption(title);
+            items.add(item);
+            reader.endObject();
+        }
+        Log.i(TAG,"Items before: " + items);
+        reader.endArray();
+//        return items;
     }
 
 }
