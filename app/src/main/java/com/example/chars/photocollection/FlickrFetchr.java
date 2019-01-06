@@ -4,13 +4,8 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.example.chars.photocollection.data.PhotoItem;
-import com.example.chars.photocollection.data.ResultPhotos;
+import com.example.chars.photocollection.data.PhotoResult;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 
 import org.json.JSONArray;
@@ -22,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +47,8 @@ public class FlickrFetchr {
             Log.i(TAG,"Received Json: " + jsonString);
 //            JSONObject jsonBody = new JSONObject(jsonString);
 //            parseItems(items, jsonBody);
-            parseItemsWhitGson(jsonString, items);
+//            parseItemsWithGson(jsonString, items);
+            items = parseItemsWithGson(jsonString);
         } catch (IOException e) {
             Log.e(TAG,"Failed to fetch items");
         }
@@ -119,18 +114,23 @@ public class FlickrFetchr {
         }
     }
 
-    public void parseItemsWhitGson(String json, List<PhotoItem> items) throws IOException {
-        Log.i(TAG,"parseItemWhitGson.");
-//        List<PhotoItem> pItems = new ArrayList<>();
+    public List<PhotoItem> parseItemsWithGson(String json) {
+        List<PhotoItem> items = new ArrayList<>();
+        PhotoResult result = new Gson().fromJson(json, PhotoResult.class);
+        List<PhotoResult.PhotosBean.PhotoBean> photolist = result.photos.photo;
+        for (int i = 0; i < photolist.size(); i++) {
+            PhotoItem item = new PhotoItem();
+            item.setCaption(photolist.get(i).title);
+            item.setOwner(photolist.get(i).owner);
+            item.setUrl(photolist.get(i).url_s);
+            item.setId(photolist.get(i).id);
+            items.add(item);
+        }
+        return items;
+    }
 
-//        JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
-//        JsonArray jsonArray = jsonObject.getAsJsonArray("photo");
-//        Log.i(TAG,"jsonObject:" + jsonObject);
-//        Log.i(TAG,"jsonArray:" + jsonArray);
-//        List<ResultPhotos.photo> photos = new Gson().fromJson(jsonArray,
-//                new TypeToken<List<ResultPhotos.photo>>(){}.getType());
-//        ResultPhotos resultPhotos = new Gson().fromJson(json, ResultPhotos.class);
-//        List<ResultPhotos.photo> photos = resultPhotos.photos;
+    public void parseItemsWithGson(String json, List<PhotoItem> items) throws IOException {
+        Log.i(TAG,"parseItemWhitGson.");
         JsonReader reader = new JsonReader(new StringReader(json));
         try {
             reader.beginObject();
@@ -146,29 +146,6 @@ public class FlickrFetchr {
         } finally {
             reader.close();
         }
-
-
-//        for (ResultPhotos.photo item : photos) {
-//            PhotoItem photoItem = new PhotoItem();
-//            photoItem.setCaption(item.title);
-//            photoItem.setId(String.valueOf(item.id));
-//            photoItem.setUrl(item.url_s);
-//            photoItem.setOwner(item.owner);
-//            pItems.add(photoItem);
-//        }
-
-//        for (JsonElement element :jsonArray) {
-//            ResultPhotos.photo photo = new Gson().fromJson(element,
-//                    new TypeToken<ResultPhotos.photo>(){}.getType());
-//            PhotoItem photoItem = new PhotoItem();
-//            photoItem.setCaption(photo.title);
-//            photoItem.setId(String.valueOf(photo.id));
-//            photoItem.setUrl(photo.url_s);
-//            photoItem.setOwner(photo.owner);
-//            pItems.add(photoItem);
-//        }
-
-//        return pItems;
     }
 
     private void readPhotos(JsonReader reader, List<PhotoItem> items) throws IOException {
@@ -183,13 +160,11 @@ public class FlickrFetchr {
             }
         }
         reader.endObject();
-//        return pItems;
     }
 
     private void readPhoto(JsonReader reader, List<PhotoItem> items)  throws IOException {
         reader.beginArray();
         String id = null,url_s = null,owner = null,title = null;
-//        List<PhotoItem> items = new ArrayList<>();
         while (reader.hasNext()) {
             PhotoItem item = new PhotoItem();
             reader.beginObject();
@@ -222,7 +197,6 @@ public class FlickrFetchr {
         }
         Log.i(TAG,"Items before: " + items);
         reader.endArray();
-//        return items;
     }
 
 }
