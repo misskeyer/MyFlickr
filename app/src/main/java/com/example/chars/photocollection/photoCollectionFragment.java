@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -66,23 +67,24 @@ public class photoCollectionFragment extends VisibleFragment {
 //        LoaderManager.getInstance(this).initLoader(1,null,this).forceLoad();
         Handler responseHandler = new Handler();
         thumbnailDownloader = new ThumbnailDownloader<>(responseHandler);
-        thumbnailDownloader.setThumbnailDownloadListener(new ThumbnailDownloader.ThumbnailDownloadListener<PhotoHolder>() {
-            @Override
-            public void onThumbnailDownloaded(PhotoHolder target, Bitmap thumbnail) {
-                Drawable drawable = new BitmapDrawable(getResources(), thumbnail);
-                target.bindPhoto(drawable);
-            }
-        });
+        thumbnailDownloader.setThumbnailDownloadListener(
+                new ThumbnailDownloader.ThumbnailDownloadListener<PhotoHolder>() {
+                    @Override
+                    public void onThumbnailDownloaded(PhotoHolder target, Bitmap thumbnail) {
+                        Drawable drawable = new BitmapDrawable(getResources(), thumbnail);
+                        target.bindPhoto(drawable);
+                    }
+                });
         thumbnailDownloader.start();
         thumbnailDownloader.getLooper();
-        Log.i(TAG,"Background thread started.");
+        Log.i(TAG, "Background thread started.");
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_photo_container,container,false);
+        View view = inflater.inflate(R.layout.fragment_photo_container, container, false);
         photoRecyclerView = view.findViewById(R.id.fragment_photo_collection);
         photoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
         setupAdapter();
@@ -95,24 +97,26 @@ public class photoCollectionFragment extends VisibleFragment {
         inflater.inflate(R.menu.fragment_photo_collection, menu);
         MenuItem searchItem = menu.findItem(R.id.menu_item_search);
         final SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setSubmitButtonEnabled(true);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Log.d(TAG,"QueryTextSubmit" + query);
+                Log.d(TAG, "QueryTextSubmit" + query);
                 QueryPreferences.setStoredQuery(getActivity(), query);
                 updateItems();
+                searchView.clearFocus();
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                Log.d(TAG,"QueryTextChange" + newText);
+                Log.d(TAG, "QueryTextChange" + newText);
                 return false;
             }
         });
 
-        searchView.setOnClickListener(new View.OnClickListener() {
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String query = QueryPreferences.getStoredQuery(getActivity());
@@ -148,7 +152,7 @@ public class photoCollectionFragment extends VisibleFragment {
     public void onDestroy() {
         super.onDestroy();
         thumbnailDownloader.quit();
-        Log.i(TAG,"Background thread destroyed.");
+        Log.i(TAG, "Background thread destroyed.");
     }
 
     @Override
@@ -163,8 +167,45 @@ public class photoCollectionFragment extends VisibleFragment {
     }
 
     private void setupAdapter() {
-        if (isAdded())
+        if (isAdded()) {
             photoRecyclerView.setAdapter(new PhotoAdapter(items));
+            photoRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+                    switch (newState) {
+                        case RecyclerView.SCROLL_STATE_IDLE:
+                            GridLayoutManager gridLayoutManager = (GridLayoutManager) photoRecyclerView.getLayoutManager();
+                            PhotoAdapter photoAdapter = (PhotoAdapter) photoRecyclerView.getAdapter();
+
+                            if (gridLayoutManager != null) {
+                                int startPosi = gridLayoutManager.findLastVisibleItemPosition() + 1;
+                                int upperLimit = Math.min(startPosi + 10, photoAdapter.getItemCount());
+                                for (int i = startPosi; i < upperLimit; i++) {
+                                    Log.i(TAG,"onScrollstateChanged.");
+                                    thumbnailDownloader.preloadImage(photoAdapter.getPhotoItem(i).getUrl());
+                                }
+
+                                startPosi = gridLayoutManager.findFirstVisibleItemPosition() - 1;
+                                int lowerLimit = Math.max(startPosi - 10, 0);
+                                for (int i = startPosi; i > lowerLimit; i--) {
+                                    thumbnailDownloader.preloadImage(photoAdapter.getPhotoItem(i).getUrl());
+                                }
+                            }
+                            break;
+                        case RecyclerView.SCROLL_STATE_DRAGGING:
+                            thumbnailDownloader.clearPreloadQueue();
+                            Log.i(TAG,"onScrolled.");
+
+                            break;
+                    }
+                }
+                @Override
+                public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                }
+            });
+        }
     }
 
     private class FetchItemTask extends AsyncTask<Void, Void, List<PhotoItem>> {
@@ -235,15 +276,38 @@ public class photoCollectionFragment extends VisibleFragment {
         @Override
         public void onBindViewHolder(@NonNull PhotoHolder photoHolder, int i) {
             PhotoItem item = photoItems.get(i);
-            Drawable placeHolder = getResources().getDrawable(R.drawable.ic_launcher_background);
-            photoHolder.bindPhoto(placeHolder);
-            photoHolder.bindPhotoItem(item);
-            thumbnailDownloader.queueThumbnail(photoHolder, item.getUrl());
+            Bitmap bitmap = thumbnailDownloader.getCachedImage(item.getUrl());
+            if (bitmap == null) {
+                Drawable drawable = getResources().getDrawable(R.drawable.ic_launcher_background);
+                photoHolder.bindPhoto(drawable);
+                photoHolder.bindPhotoItem(item);
+                thumbnailDownloader.queueThumbnail(photoHolder, item.getUrl());
+            } else {
+                Log.i(TAG, "Loaded image from cache");
+                photoHolder.bindPhoto(new BitmapDrawable(getResources(), bitmap));
+            }
+//            preloadAdjacentPhotos(i);
+        }
+
+        private void preloadAdjacentPhotos(int position) {
+            final int photoBufferSize = 10;
+            int startIndex = Math.max(position - photoBufferSize, 0);
+            int endIndex = Math.min(photoBufferSize + position, photoItems.size() - 1);
+            for (int i = startIndex; i < endIndex; i++) {
+                if (i == position)
+                    continue;
+                String url = photoItems.get(i).getUrl();
+                thumbnailDownloader.preloadImage(url);
+            }
         }
 
         @Override
         public int getItemCount() {
             return photoItems.size();
+        }
+
+        public PhotoItem getPhotoItem(int position) {
+            return photoItems.get(position);
         }
     }
 }
