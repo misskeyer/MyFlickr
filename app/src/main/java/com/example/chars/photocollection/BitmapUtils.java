@@ -1,8 +1,13 @@
 package com.example.chars.photocollection;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.util.LruCache;
 
@@ -42,6 +47,15 @@ public class BitmapUtils {
         return result.toString();
     }
 
+    public static void verifyPermission(Activity activity) {
+        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
+                PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        }
+    }
+
     public static void setBitmapToLocal(Bitmap bitmap, String url) {
         try {
             String picName = MD5Encoder(url);
@@ -51,12 +65,12 @@ public class BitmapUtils {
             }
             File file = new File(PATH, picName + ".jpg");
 
-            Log.i(TAG,"File created.");
+            Log.i(TAG, "File created.");
             FileOutputStream out = new FileOutputStream(file);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
             out.flush();
             out.close();
-            Log.i(TAG,"Write to sdcard.");
+            Log.i(TAG, "Write to sdcard.");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -67,7 +81,7 @@ public class BitmapUtils {
     public static Bitmap getBitmapFromLocal(String url) {
         String fileName = null;
         fileName = MD5Encoder(url);
-        File file = new File(PATH, fileName);
+        File file = new File(PATH, fileName + ".jpg");
         Bitmap bitmap = null;
 
         try {

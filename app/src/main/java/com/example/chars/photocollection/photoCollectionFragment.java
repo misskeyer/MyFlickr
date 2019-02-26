@@ -63,6 +63,7 @@ public class photoCollectionFragment extends VisibleFragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         setHasOptionsMenu(true);
+        BitmapUtils.verifyPermission(getActivity());
         updateItems();
 //        LoaderManager.getInstance(this).initLoader(1,null,this).forceLoad();
         Handler responseHandler = new Handler();
@@ -182,7 +183,7 @@ public class photoCollectionFragment extends VisibleFragment {
                                 int startPosi = gridLayoutManager.findLastVisibleItemPosition() + 1;
                                 int upperLimit = Math.min(startPosi + 10, photoAdapter.getItemCount());
                                 for (int i = startPosi; i < upperLimit; i++) {
-                                    Log.i(TAG,"onScrollstateChanged.");
+                                    Log.i(TAG, "onScrollstateChanged.");
                                     thumbnailDownloader.preloadImage(photoAdapter.getPhotoItem(i).getUrl());
                                 }
 
@@ -195,11 +196,12 @@ public class photoCollectionFragment extends VisibleFragment {
                             break;
                         case RecyclerView.SCROLL_STATE_DRAGGING:
                             thumbnailDownloader.clearPreloadQueue();
-                            Log.i(TAG,"onScrolled.");
+                            Log.i(TAG, "onScrolled.");
 
                             break;
                     }
                 }
+
                 @Override
                 public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                     super.onScrolled(recyclerView, dx, dy);
@@ -278,14 +280,28 @@ public class photoCollectionFragment extends VisibleFragment {
             PhotoItem item = photoItems.get(i);
             Bitmap bitmap = thumbnailDownloader.getCachedImage(item.getUrl());
             if (bitmap == null) {
-                Drawable drawable = getResources().getDrawable(R.drawable.ic_launcher_background);
-                photoHolder.bindPhoto(drawable);
-                photoHolder.bindPhotoItem(item);
-                thumbnailDownloader.queueThumbnail(photoHolder, item.getUrl());
-            } else {
-                Log.i(TAG, "Loaded image from cache");
+                bitmap = BitmapUtils.getBitmapFromLocal(item.getUrl());
+                if (bitmap == null){
+                    Drawable drawable = getResources().getDrawable(R.drawable.ic_launcher_background);
+                    photoHolder.bindPhoto(drawable);
+                    photoHolder.bindPhotoItem(item);
+                    thumbnailDownloader.queueThumbnail(photoHolder, item.getUrl());
+                    Log.i(TAG,"Loaded iamge from net");
+                } else {
+                    photoHolder.bindPhoto(new BitmapDrawable(getResources(), bitmap));
+                    Log.i(TAG,"Loaded iamge from disk");
+                }
+            }else {
                 photoHolder.bindPhoto(new BitmapDrawable(getResources(), bitmap));
+                Log.i(TAG,"Loaded iamge from cache");
             }
+//            Log.i(TAG, "Loaded image from cache");
+//            if (bitmap != null) {
+//                Log.i(TAG,"Loaded image from disk.");
+//            } else {
+//                photoHolder.bindPhoto(new BitmapDrawable(getResources(), bitmap));
+//                Log.i(TAG,"Loaded iamge from net");
+//            }
 //            preloadAdjacentPhotos(i);
         }
 
