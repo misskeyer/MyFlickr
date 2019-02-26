@@ -295,13 +295,6 @@ public class photoCollectionFragment extends VisibleFragment {
                 photoHolder.bindPhoto(new BitmapDrawable(getResources(), bitmap));
                 Log.i(TAG,"Loaded iamge from cache");
             }
-//            Log.i(TAG, "Loaded image from cache");
-//            if (bitmap != null) {
-//                Log.i(TAG,"Loaded image from disk.");
-//            } else {
-//                photoHolder.bindPhoto(new BitmapDrawable(getResources(), bitmap));
-//                Log.i(TAG,"Loaded iamge from net");
-//            }
 //            preloadAdjacentPhotos(i);
         }
 
