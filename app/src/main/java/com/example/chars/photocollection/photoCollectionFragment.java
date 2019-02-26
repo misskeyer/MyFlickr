@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.support.v7.widget.SearchView;
 
+import com.bumptech.glide.Glide;
 import com.example.chars.photocollection.data.PhotoItem;
 
 import java.util.ArrayList;
@@ -66,19 +67,19 @@ public class photoCollectionFragment extends VisibleFragment {
         BitmapUtils.verifyPermission(getActivity());
         updateItems();
 //        LoaderManager.getInstance(this).initLoader(1,null,this).forceLoad();
-        Handler responseHandler = new Handler();
-        thumbnailDownloader = new ThumbnailDownloader<>(responseHandler);
-        thumbnailDownloader.setThumbnailDownloadListener(
-                new ThumbnailDownloader.ThumbnailDownloadListener<PhotoHolder>() {
-                    @Override
-                    public void onThumbnailDownloaded(PhotoHolder target, Bitmap thumbnail) {
-                        Drawable drawable = new BitmapDrawable(getResources(), thumbnail);
-                        target.bindPhoto(drawable);
-                    }
-                });
-        thumbnailDownloader.start();
-        thumbnailDownloader.getLooper();
-        Log.i(TAG, "Background thread started.");
+//        Handler responseHandler = new Handler();
+//        thumbnailDownloader = new ThumbnailDownloader<>(responseHandler);
+//        thumbnailDownloader.setThumbnailDownloadListener(
+//                new ThumbnailDownloader.ThumbnailDownloadListener<PhotoHolder>() {
+//                    @Override
+//                    public void onThumbnailDownloaded(PhotoHolder target, Bitmap thumbnail) {
+//                        Drawable drawable = new BitmapDrawable(getResources(), thumbnail);
+//                        target.bindPhoto(drawable);
+//                    }
+//                });
+//        thumbnailDownloader.start();
+//        thumbnailDownloader.getLooper();
+//        Log.i(TAG, "Background thread started.");
     }
 
     @Nullable
@@ -170,43 +171,43 @@ public class photoCollectionFragment extends VisibleFragment {
     private void setupAdapter() {
         if (isAdded()) {
             photoRecyclerView.setAdapter(new PhotoAdapter(items));
-            photoRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                    super.onScrollStateChanged(recyclerView, newState);
-                    switch (newState) {
-                        case RecyclerView.SCROLL_STATE_IDLE:
-                            GridLayoutManager gridLayoutManager = (GridLayoutManager) photoRecyclerView.getLayoutManager();
-                            PhotoAdapter photoAdapter = (PhotoAdapter) photoRecyclerView.getAdapter();
-
-                            if (gridLayoutManager != null) {
-                                int startPosi = gridLayoutManager.findLastVisibleItemPosition() + 1;
-                                int upperLimit = Math.min(startPosi + 10, photoAdapter.getItemCount());
-                                for (int i = startPosi; i < upperLimit; i++) {
-                                    Log.i(TAG, "onScrollstateChanged.");
-                                    thumbnailDownloader.preloadImage(photoAdapter.getPhotoItem(i).getUrl());
-                                }
-
-                                startPosi = gridLayoutManager.findFirstVisibleItemPosition() - 1;
-                                int lowerLimit = Math.max(startPosi - 10, 0);
-                                for (int i = startPosi; i > lowerLimit; i--) {
-                                    thumbnailDownloader.preloadImage(photoAdapter.getPhotoItem(i).getUrl());
-                                }
-                            }
-                            break;
-                        case RecyclerView.SCROLL_STATE_DRAGGING:
-                            thumbnailDownloader.clearPreloadQueue();
-                            Log.i(TAG, "onScrolled.");
-
-                            break;
-                    }
-                }
-
-                @Override
-                public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                    super.onScrolled(recyclerView, dx, dy);
-                }
-            });
+//            photoRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+////                @Override
+////                public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+////                    super.onScrollStateChanged(recyclerView, newState);
+////                    switch (newState) {
+////                        case RecyclerView.SCROLL_STATE_IDLE:
+////                            GridLayoutManager gridLayoutManager = (GridLayoutManager) photoRecyclerView.getLayoutManager();
+////                            PhotoAdapter photoAdapter = (PhotoAdapter) photoRecyclerView.getAdapter();
+////
+////                            if (gridLayoutManager != null) {
+////                                int startPosi = gridLayoutManager.findLastVisibleItemPosition() + 1;
+////                                int upperLimit = Math.min(startPosi + 10, photoAdapter.getItemCount());
+////                                for (int i = startPosi; i < upperLimit; i++) {
+////                                    Log.i(TAG, "onScrollstateChanged.");
+////                                    thumbnailDownloader.preloadImage(photoAdapter.getPhotoItem(i).getUrl());
+////                                }
+////
+////                                startPosi = gridLayoutManager.findFirstVisibleItemPosition() - 1;
+////                                int lowerLimit = Math.max(startPosi - 10, 0);
+////                                for (int i = startPosi; i > lowerLimit; i--) {
+////                                    thumbnailDownloader.preloadImage(photoAdapter.getPhotoItem(i).getUrl());
+////                                }
+////                            }
+////                            break;
+////                        case RecyclerView.SCROLL_STATE_DRAGGING:
+////                            thumbnailDownloader.clearPreloadQueue();
+////                            Log.i(TAG, "onScrolled.");
+////
+////                            break;
+////                    }
+////                }
+////
+////                @Override
+////                public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+////                    super.onScrolled(recyclerView, dx, dy);
+////                }
+////            });
         }
     }
 
@@ -278,23 +279,30 @@ public class photoCollectionFragment extends VisibleFragment {
         @Override
         public void onBindViewHolder(@NonNull PhotoHolder photoHolder, int i) {
             PhotoItem item = photoItems.get(i);
-            Bitmap bitmap = thumbnailDownloader.getCachedImage(item.getUrl());
-            if (bitmap == null) {
-                bitmap = BitmapUtils.getBitmapFromLocal(item.getUrl());
-                if (bitmap == null){
-                    Drawable drawable = getResources().getDrawable(R.drawable.ic_launcher_background);
-                    photoHolder.bindPhoto(drawable);
-                    photoHolder.bindPhotoItem(item);
-                    thumbnailDownloader.queueThumbnail(photoHolder, item.getUrl());
-                    Log.i(TAG,"Loaded iamge from net");
-                } else {
-                    photoHolder.bindPhoto(new BitmapDrawable(getResources(), bitmap));
-                    Log.i(TAG,"Loaded iamge from disk");
-                }
-            }else {
-                photoHolder.bindPhoto(new BitmapDrawable(getResources(), bitmap));
-                Log.i(TAG,"Loaded iamge from cache");
-            }
+            String url = item.getUrl();
+            Glide.with(photoCollectionFragment.this)
+                    .load(url)
+                    .placeholder(R.drawable.ic_launcher_background)
+                    .into(photoHolder.itemImage);
+            photoHolder.bindPhotoItem(item);
+
+//            Bitmap bitmap = thumbnailDownloader.getCachedImage(item.getUrl());
+//            if (bitmap == null) {
+//                bitmap = BitmapUtils.getBitmapFromLocal(item.getUrl());
+//                if (bitmap == null){
+//                    Drawable drawable = getResources().getDrawable(R.drawable.ic_launcher_background);
+//                    photoHolder.bindPhoto(drawable);
+//                    photoHolder.bindPhotoItem(item);
+//                    thumbnailDownloader.queueThumbnail(photoHolder, item.getUrl());
+//                    Log.i(TAG,"Loaded image from net");
+//                } else {
+//                    photoHolder.bindPhoto(new BitmapDrawable(getResources(), bitmap));
+//                    Log.i(TAG,"Loaded image from disk");
+//                }
+//            }else {
+//                photoHolder.bindPhoto(new BitmapDrawable(getResources(), bitmap));
+//                Log.i(TAG,"Loaded image from cache");
+//            }
 //            preloadAdjacentPhotos(i);
         }
 
