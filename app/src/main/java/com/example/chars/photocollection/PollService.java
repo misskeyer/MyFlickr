@@ -89,7 +89,7 @@ public class PollService extends IntentService {
             Log.i(TAG,"Got a new result:" + resultId);
 
             Resources resources = getResources();
-            Intent i = photoCollectionActivity.newIntent(this);
+            Intent i = PhotoCollectionActivity.newIntent(this);
             PendingIntent pi = PendingIntent.getActivity(this, 0, i, 0);
             NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             Notification notification = null;

@@ -19,13 +19,21 @@ import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class FlickrFetchr {
     private static final String TAG = "FlickrFetchr";
-    private static final String API_KEY = "e8d9c7dc1ed04cdc64a2c9628b54003b";
-    private static final String FETCH_RECENT_METHOD = "flickr.photos.getRecent";
-    private static final String SEARCH_METHOD = "flickr.photos.search";
+    public static final String API_KEY = "e8d9c7dc1ed04cdc64a2c9628b54003b";
+    public static final String FETCH_RECENT_METHOD = "flickr.photos.getRecent";
+    public static final String SEARCH_METHOD = "flickr.photos.search";
     private static final Uri ENDPOINT = Uri.parse("https://api.flickr.com/services/rest").buildUpon()
             .appendQueryParameter("api_key", API_KEY)
             .appendQueryParameter("format", "json")
@@ -44,18 +52,18 @@ public class FlickrFetchr {
         List<PhotoItem> items = new ArrayList<>();
         try {
             String jsonString = getUrlString(url);
-            Log.i(TAG,"Received Json: " + jsonString);
+            Log.i(TAG, "Received Json: " + jsonString);
 //            JSONObject jsonBody = new JSONObject(jsonString);
 //            parseItems(items, jsonBody);
 //            parseItemsWithGson(jsonString, items);
             items = parseItemsWithGson(jsonString);
         } catch (IOException e) {
-            Log.e(TAG,"Failed to fetch items");
+            Log.e(TAG, "Failed to fetch items");
         }
 //        catch (JSONException e) {
 //            Log.e(TAG,"Failed to parse Json.");
 //        }
-        Log.i(TAG,"Items after : " + items);
+        Log.i(TAG, "Items after : " + items);
         return items;
     }
 
@@ -95,11 +103,10 @@ public class FlickrFetchr {
         return downloadPhotoItem(url);
     }
 
-
-    public void parseItems(List<PhotoItem> items, JSONObject jsonBody) throws IOException, JSONException{
+    public void parseItems(List<PhotoItem> items, JSONObject jsonBody) throws IOException, JSONException {
         JSONObject photosJsonObject = jsonBody.getJSONObject("photos");
         JSONArray photoJsonArray = photosJsonObject.getJSONArray("photo");
-        for (int i = 0; i < photoJsonArray.length(); i++){
+        for (int i = 0; i < photoJsonArray.length(); i++) {
             JSONObject photoJsonObject = photoJsonArray.getJSONObject(i);
             PhotoItem item = new PhotoItem();
             item.setId(photoJsonObject.getString("id"));
@@ -130,7 +137,7 @@ public class FlickrFetchr {
     }
 
     public void parseItemsWithGson(String json, List<PhotoItem> items) throws IOException {
-        Log.i(TAG,"parseItemWhitGson.");
+        Log.i(TAG, "parseItemWhitGson.");
         JsonReader reader = new JsonReader(new StringReader(json));
         try {
             reader.beginObject();
@@ -150,11 +157,10 @@ public class FlickrFetchr {
 
     private void readPhotos(JsonReader reader, List<PhotoItem> items) throws IOException {
         reader.beginObject();
-        List<PhotoItem> pItems = new ArrayList<>();
         while (reader.hasNext()) {
             String propertyName = reader.nextName();
             if (propertyName.equals("photo")) {
-               readPhoto(reader, items);
+                readPhoto(reader, items);
             } else {
                 reader.skipValue();
             }
@@ -162,9 +168,9 @@ public class FlickrFetchr {
         reader.endObject();
     }
 
-    private void readPhoto(JsonReader reader, List<PhotoItem> items)  throws IOException {
+    private void readPhoto(JsonReader reader, List<PhotoItem> items) throws IOException {
         reader.beginArray();
-        String id = null,url_s = null,owner = null,title = null;
+        String id = null, url_s = null, owner = null, title = null;
         while (reader.hasNext()) {
             PhotoItem item = new PhotoItem();
             reader.beginObject();
@@ -188,14 +194,13 @@ public class FlickrFetchr {
                         break;
                 }
             }
-                item.setId(id);
-                item.setUrl(url_s);
-                item.setOwner(owner);
-                item.setCaption(title);
+            item.setId(id);
+            item.setUrl(url_s);
+            item.setOwner(owner);
+            item.setCaption(title);
             items.add(item);
             reader.endObject();
         }
-        Log.i(TAG,"Items before: " + items);
         reader.endArray();
     }
 
