@@ -8,4 +8,7 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <declare-styleable name="jj">
+        <attr name="fs" format="dimension"/>
+    </declare-styleable>
 </resources>
