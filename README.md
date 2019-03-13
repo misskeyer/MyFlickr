@@ -1,6 +1,6 @@
 # 关于PhotoCollection
 -------
-##简介
+## 简介
 
 
 - Flickr网站的自定义客户端，它能获取并展示Flickr网站的最新公共图片。
