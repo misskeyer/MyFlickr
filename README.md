@@ -1,4 +1,5 @@
-# 关于PhotoCollection
+## 关于PhotoCollection
+
 ----------
 
 ## 简介
