@@ -1,4 +1,4 @@
-package com.example.chars.photocollection;
+package com.example.chars.photocollection.ui;
 
 import android.content.Context;
 import android.content.Intent;

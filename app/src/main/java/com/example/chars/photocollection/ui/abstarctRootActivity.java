@@ -1,10 +1,12 @@
-package com.example.chars.photocollection;
+package com.example.chars.photocollection.ui;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+
+import com.example.chars.photocollection.R;
 
 public abstract class abstarctRootActivity extends AppCompatActivity {
     protected abstract Fragment createFragment();

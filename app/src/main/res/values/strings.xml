@@ -6,4 +6,7 @@
     <string name="stop_polling">Stop polling</string>
     <string name="new_photos_title">New photos</string>
     <string name="new_photos_text">You have new photos here!</string>
+    <string name="nav_header_title">PhotoCollection</string>
+    <string name="nav_header_subtitle">example.email.com</string>
+    <string name="nav_header_desc">Navigation Header</string>
 </resources>

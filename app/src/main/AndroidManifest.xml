@@ -21,25 +21,25 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".PhotoCollectionActivity">
+        <activity android:name=".ui.PhotoCollectionActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".PhotoPageActivity"
+        <activity android:name=".ui.PhotoPageActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"/>
 
-        <service android:name=".PollService"/>
+        <service android:name=".background.PollService"/>
 
-        <receiver android:name=".StartupReceiver">
+        <receiver android:name=".background.StartupReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".NotificationReceiver"
+        <receiver android:name=".background.NotificationReceiver"
             android:exported="false">
             <intent-filter
                 android:priority="-999">

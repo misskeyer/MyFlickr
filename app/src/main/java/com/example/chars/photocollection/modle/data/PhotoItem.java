@@ -1,4 +1,4 @@
-package com.example.chars.photocollection.data;
+package com.example.chars.photocollection.modle.data;
 
 import android.net.Uri;
 

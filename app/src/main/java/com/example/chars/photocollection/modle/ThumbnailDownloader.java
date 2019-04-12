@@ -1,17 +1,17 @@
-package com.example.chars.photocollection;
+package com.example.chars.photocollection.modle;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.util.Log;
 import android.util.LruCache;
 
+import com.example.chars.photocollection.modle.FlickrFetchr;
+import com.example.chars.photocollection.util.BitmapUtils;
+
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 

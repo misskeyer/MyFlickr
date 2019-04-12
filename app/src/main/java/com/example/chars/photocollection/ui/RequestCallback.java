@@ -1,9 +1,7 @@
-package com.example.chars.photocollection;
+package com.example.chars.photocollection.ui;
 
-import android.util.Log;
-
-import com.example.chars.photocollection.data.PhotoItem;
-import com.example.chars.photocollection.data.PhotoResult;
+import com.example.chars.photocollection.modle.data.PhotoItem;
+import com.example.chars.photocollection.modle.data.PhotoResult;
 
 import java.util.ArrayList;
 import java.util.List;

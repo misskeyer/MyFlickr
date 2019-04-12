@@ -1,10 +1,10 @@
-package com.example.chars.photocollection;
+package com.example.chars.photocollection.modle;
 
 import android.net.Uri;
 import android.util.Log;
 
-import com.example.chars.photocollection.data.PhotoItem;
-import com.example.chars.photocollection.data.PhotoResult;
+import com.example.chars.photocollection.modle.data.PhotoItem;
+import com.example.chars.photocollection.modle.data.PhotoResult;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 
@@ -19,15 +19,7 @@ import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class FlickrFetchr {
     private static final String TAG = "FlickrFetchr";

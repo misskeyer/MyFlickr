@@ -1,6 +1,6 @@
-package com.example.chars.photocollection;
+package com.example.chars.photocollection.ui;
 
-import com.example.chars.photocollection.data.PhotoResult;
+import com.example.chars.photocollection.modle.data.PhotoResult;
 
 import java.util.Map;
 

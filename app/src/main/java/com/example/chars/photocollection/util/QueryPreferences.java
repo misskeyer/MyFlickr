@@ -1,4 +1,4 @@
-package com.example.chars.photocollection;
+package com.example.chars.photocollection.util;
 
 import android.content.Context;
 import android.preference.PreferenceManager;

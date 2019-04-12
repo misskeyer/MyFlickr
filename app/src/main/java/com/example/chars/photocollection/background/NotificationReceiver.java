@@ -1,13 +1,14 @@
-package com.example.chars.photocollection;
+package com.example.chars.photocollection.background;
 
 import android.app.Activity;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
+
+import com.example.chars.photocollection.background.PollService;
 
 public class NotificationReceiver extends BroadcastReceiver {
     private static final String TAG = "MyNotificationReceiver";

@@ -1,4 +1,4 @@
-package com.example.chars.photocollection;
+package com.example.chars.photocollection.background;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -18,7 +18,11 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
-import com.example.chars.photocollection.data.PhotoItem;
+import com.example.chars.photocollection.R;
+import com.example.chars.photocollection.modle.data.PhotoItem;
+import com.example.chars.photocollection.modle.FlickrFetchr;
+import com.example.chars.photocollection.ui.PhotoCollectionActivity;
+import com.example.chars.photocollection.util.QueryPreferences;
 
 import java.util.List;
 

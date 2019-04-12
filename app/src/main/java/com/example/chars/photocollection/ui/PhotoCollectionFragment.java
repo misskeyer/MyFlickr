@@ -1,4 +1,4 @@
-package com.example.chars.photocollection;
+package com.example.chars.photocollection.ui;
 
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,8 +20,16 @@ import android.widget.ImageView;
 import android.support.v7.widget.SearchView;
 
 import com.bumptech.glide.Glide;
-import com.example.chars.photocollection.data.PhotoItem;
-import com.example.chars.photocollection.data.PhotoResult;
+import com.example.chars.photocollection.ui.adapter.PhotoAdapter;
+import com.example.chars.photocollection.ui.holder.PhotoHolder;
+import com.example.chars.photocollection.util.BitmapUtils;
+import com.example.chars.photocollection.modle.FlickrFetchr;
+import com.example.chars.photocollection.background.PollService;
+import com.example.chars.photocollection.util.QueryPreferences;
+import com.example.chars.photocollection.R;
+import com.example.chars.photocollection.modle.ThumbnailDownloader;
+import com.example.chars.photocollection.modle.data.PhotoItem;
+import com.example.chars.photocollection.modle.data.PhotoResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -97,7 +106,8 @@ public class PhotoCollectionFragment extends VisibleFragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_photo_container, container, false);
         photoRecyclerView = view.findViewById(R.id.fragment_photo_collection);
-        photoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+        photoRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(),
+                LinearLayoutManager.VERTICAL, false));
         setupAdapter();
         return view;
     }
@@ -181,7 +191,7 @@ public class PhotoCollectionFragment extends VisibleFragment {
 
     private void setupAdapter() {
         if (isAdded()) {
-            photoRecyclerView.setAdapter(new PhotoAdapter(items));
+            photoRecyclerView.setAdapter(new PhotoAdapter(getActivity(), items));
 //            photoRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 //                @Override
 //                public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -285,99 +295,6 @@ public class PhotoCollectionFragment extends VisibleFragment {
                 Log.i(TAG, "connect failed");
             }
         });
-    }
-
-    private class PhotoHolder extends RecyclerView.ViewHolder {
-        private ImageView itemImage;
-        private PhotoItem photoItem;
-
-        public PhotoHolder(@NonNull View itemView) {
-            super(itemView);
-            itemImage = itemView.findViewById(R.id.fragment_photo_collection_image_view);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent i = PhotoPageActivity
-                            .newIntent(getActivity(), photoItem.getPhotoPageUri());
-                    startActivity(i);
-                }
-            });
-        }
-
-        public void bindPhotoItem(PhotoItem item) {
-            photoItem = item;
-        }
-
-        public void bindPhoto(Drawable drawable) {
-            itemImage.setImageDrawable(drawable);
-        }
-    }
-
-    private class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder> {
-        private List<PhotoItem> photoItems;
-
-        public PhotoAdapter(List<PhotoItem> items) {
-            photoItems = items;
-        }
-
-        @NonNull
-        @Override
-        public PhotoHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-            LayoutInflater inflater = LayoutInflater.from(getActivity());
-            View view = inflater.inflate(R.layout.photo_item, viewGroup, false);
-            return new PhotoHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull PhotoHolder photoHolder, int i) {
-            PhotoItem item = photoItems.get(i);
-            String url = item.getUrl();
-            Glide.with(PhotoCollectionFragment.this)
-                    .load(url)
-                    .placeholder(R.drawable.ic_launcher_background)
-                    .into(photoHolder.itemImage);
-            photoHolder.bindPhotoItem(item);
-
-//            Bitmap bitmap = thumbnailDownloader.getCachedImage(item.getUrl());
-//            if (bitmap == null) {
-//                bitmap = BitmapUtils.getBitmapFromLocal(item.getUrl());
-//                if (bitmap == null){
-//                    Drawable drawable = getResources().getDrawable(R.drawable.ic_launcher_background);
-//                    photoHolder.bindPhoto(drawable);
-//                    photoHolder.bindPhotoItem(item);
-//                    thumbnailDownloader.queueThumbnail(photoHolder, item.getUrl());
-//                    Log.i(TAG,"Loaded image from net");
-//                } else {
-//                    photoHolder.bindPhoto(new BitmapDrawable(getResources(), bitmap));
-//                    Log.i(TAG,"Loaded image from disk");
-//                }
-//            }else {
-//                photoHolder.bindPhoto(new BitmapDrawable(getResources(), bitmap));
-//                Log.i(TAG,"Loaded image from cache");
-//            }
-//            preloadAdjacentPhotos(i);
-        }
-
-        private void preloadAdjacentPhotos(int position) {
-            final int photoBufferSize = 10;
-            int startIndex = Math.max(position - photoBufferSize, 0);
-            int endIndex = Math.min(photoBufferSize + position, photoItems.size() - 1);
-            for (int i = startIndex; i < endIndex; i++) {
-                if (i == position)
-                    continue;
-                String url = photoItems.get(i).getUrl();
-                thumbnailDownloader.preloadImage(url);
-            }
-        }
-
-        @Override
-        public int getItemCount() {
-            return photoItems.size();
-        }
-
-        public PhotoItem getPhotoItem(int position) {
-            return photoItems.get(position);
-        }
     }
 }
 

@@ -1,4 +1,4 @@
-package com.example.chars.photocollection;
+package com.example.chars.photocollection.ui;
 
 import android.annotation.SuppressLint;
 import android.net.Uri;
@@ -14,6 +14,8 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
+
+import com.example.chars.photocollection.R;
 
 import java.util.Objects;
 
