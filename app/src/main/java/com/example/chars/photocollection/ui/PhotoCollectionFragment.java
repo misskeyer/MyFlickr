@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -37,18 +38,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import butterknife.BindView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class PhotoCollectionFragment extends VisibleFragment {
+public class PhotoCollectionFragment extends VisibleFragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "PhotoCollectionFragment";
     private RecyclerView photoRecyclerView;
     private List<PhotoItem> items = new ArrayList<>();
     private ThumbnailDownloader<PhotoHolder> thumbnailDownloader;
     private RequestPhotoCallback callback;
+    private SwipeRefreshLayout mRefreshLayout;
 
 //    @NonNull
 //    @Override
@@ -105,10 +108,12 @@ public class PhotoCollectionFragment extends VisibleFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_photo_container, container, false);
-        photoRecyclerView = view.findViewById(R.id.fragment_photo_collection);
+        photoRecyclerView = view.findViewById(R.id.recyclerview);
+        mRefreshLayout = view.findViewById(R.id.swipe_refresh);
         photoRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(),
                 LinearLayoutManager.VERTICAL, false));
         setupAdapter();
+        mRefreshLayout.setOnRefreshListener(this);
         return view;
     }
 
@@ -167,6 +172,12 @@ public class PhotoCollectionFragment extends VisibleFragment {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        updateItems();
+        mRefreshLayout.setRefreshing(false);
     }
 
     @Override

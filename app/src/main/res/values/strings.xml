@@ -9,4 +9,6 @@
     <string name="nav_header_title">PhotoCollection</string>
     <string name="nav_header_subtitle">example.email.com</string>
     <string name="nav_header_desc">Navigation Header</string>
+    <string name="openNavigationDrawer">Open Navigation Drawer</string>
+    <string name="closeNavigatinDrawer">Close Navigation Drawer</string>
 </resources>

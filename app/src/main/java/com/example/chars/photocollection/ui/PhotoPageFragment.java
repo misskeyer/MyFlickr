@@ -65,8 +65,8 @@ public class PhotoPageFragment extends VisibleFragment {
             @Override
             public void onReceivedTitle(WebView view, String title) {
                 AppCompatActivity activity = (AppCompatActivity) getActivity();
-                assert activity != null;
-                Objects.requireNonNull(activity.getSupportActionBar()).setSubtitle(title);
+//                assert activity != null;
+//                Objects.requireNonNull(activity.getSupportActionBar()).setSubtitle(title);
             }
         });
 
