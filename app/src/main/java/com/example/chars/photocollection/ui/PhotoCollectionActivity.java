@@ -2,9 +2,12 @@ package com.example.chars.photocollection.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -16,6 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.example.chars.photocollection.R;
 import com.example.chars.photocollection.ui.adapter.FragmentAdapter;
@@ -38,6 +42,8 @@ public class PhotoCollectionActivity extends AppCompatActivity implements
     DrawerLayout mDrawerLayout;
     @BindView(R.id.nv_slide)
     NavigationView mNavigationView;
+    @BindView(R.id.collapsing_toolbar)
+    CollapsingToolbarLayout mCollapsingToolbarLayout;
 
     private ViewPager mViewPager;
 
@@ -58,21 +64,30 @@ public class PhotoCollectionActivity extends AppCompatActivity implements
         initViewPager();
         ButterKnife.bind(this);
         setSupportActionBar(mToolbar);
+        mCollapsingToolbarLayout.setTitleEnabled(false);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar,
                 R.string.openNavigationDrawer, R.string.closeNavigatinDrawer);
         mDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
         mNavigationView.setNavigationItemSelectedListener(this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+            getWindow().setNavigationBarColor(Color.TRANSPARENT);
+        }
     }
 
     private void initViewPager() {
         TabLayout mTabLayout = findViewById(R.id.tab_layout);
         List<String> titles = new ArrayList<>();
-        titles.add("Recent");
+        titles.add("最近");
         titles.add("待定");
-        titles.add("待定");
-        titles.add("待定");
+
         for (int i = 0; i < titles.size(); i++) {
             mTabLayout.addTab(mTabLayout.newTab().setText(titles.get(i)));
         }

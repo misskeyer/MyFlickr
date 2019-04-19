@@ -10,7 +10,8 @@ public class RequestCallback implements PhotoCollectionFragment.RequestPhotoCall
     private static final String TAG = "RequestCallback";
 
     @Override
-    public void requestSuccess(PhotoCollectionFragment fragment , List<PhotoResult.PhotosBean.PhotoBean> list) {
+    public void requestSuccess(PhotoCollectionFragment fragment , List<PhotoResult.PhotosBean
+            .PhotoBean> list) {
         List<PhotoItem> items = new ArrayList<>();
 
         for (int i = 0; i < list.size(); i++) {

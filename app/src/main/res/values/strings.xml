@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PhotoCollection</string>
+    <string name="app_name">PhotoFlickr</string>
     <string name="search">Search</string>
     <string name="clear_search">Clear history</string>
     <string name="start_polling">Start polling</string>
