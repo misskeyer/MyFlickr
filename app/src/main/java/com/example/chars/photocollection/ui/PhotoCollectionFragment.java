@@ -39,10 +39,16 @@ import java.util.Map;
 import java.util.Objects;
 
 import butterknife.BindView;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class PhotoCollectionFragment extends VisibleFragment implements SwipeRefreshLayout.OnRefreshListener {
@@ -197,7 +203,8 @@ public class PhotoCollectionFragment extends VisibleFragment implements SwipeRef
         String query = QueryPreferences.getStoredQuery(getActivity());
         callback = new RequestCallback();
 //        new FetchItemTask(query).execute();
-        requestItem(query);
+//        requestItem(query);
+        requestItemsWithRxJava(query);
     }
 
     private void setupAdapter() {
@@ -306,6 +313,87 @@ public class PhotoCollectionFragment extends VisibleFragment implements SwipeRef
                 Log.i(TAG, "connect failed");
             }
         });
+    }
+
+    private void requestItemsWithRxJava(String query) {
+        Map<String, String> options = new HashMap<>();
+
+        options.put("api_key", FlickrFetchr.API_KEY);
+        options.put("format", "json");
+        options.put("nojsoncallback", "1");
+        options.put("extras", "url_s");
+
+        GetRequest api = new Retrofit.Builder().baseUrl("https://api.flickr.com/")
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+                .create(GetRequest.class);
+
+        if (query != null) {
+            api.requestRxQ(options, FlickrFetchr.SEARCH_METHOD, query)
+                    .observeOn(Schedulers.io())
+                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<PhotoResult>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(PhotoResult photoResult) {
+                            parsePhotoResult(photoResult);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.i(TAG,"RxConnectionError");
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            Log.i(TAG, "RxConnectionComplete");
+                        }
+                    });
+        }else {
+            api.requestRx(options, FlickrFetchr.FETCH_RECENT_METHOD)
+                    .observeOn(Schedulers.io())
+                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<PhotoResult>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(PhotoResult photoResult) {
+                            parsePhotoResult(photoResult);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    });
+        }
+    }
+
+    private void parsePhotoResult(PhotoResult photoResult){
+        List<PhotoResult.PhotosBean.PhotoBean> list = photoResult.photos.photo;
+        List<PhotoItem> items = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            PhotoItem item = new PhotoItem();
+            item.setCaption(list.get(i).title);
+            item.setOwner(list.get(i).owner);
+            item.setUrl(list.get(i).url_s);
+            item.setId(list.get(i).id);
+            items.add(item);
+        }
+        init(items);
     }
 }
 
