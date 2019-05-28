@@ -1,10 +1,10 @@
-package com.example.chars.photocollection.modle;
+package com.example.chars.photocollection.network;
 
 import android.net.Uri;
 import android.util.Log;
 
-import com.example.chars.photocollection.modle.data.PhotoItem;
-import com.example.chars.photocollection.modle.data.PhotoResult;
+import com.example.chars.photocollection.common.data.PhotoItem;
+import com.example.chars.photocollection.network.json.PhotoRecent;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 
@@ -26,6 +26,7 @@ public class FlickrFetchr {
     public static final String API_KEY = "e8d9c7dc1ed04cdc64a2c9628b54003b";
     public static final String FETCH_RECENT_METHOD = "flickr.photos.getRecent";
     public static final String SEARCH_METHOD = "flickr.photos.search";
+    public static final String GET_SIZES = "flickr.photos.getSizes";
     private static final Uri ENDPOINT = Uri.parse("https://api.flickr.com/services/rest").buildUpon()
             .appendQueryParameter("api_key", API_KEY)
             .appendQueryParameter("format", "json")
@@ -115,8 +116,8 @@ public class FlickrFetchr {
 
     public List<PhotoItem> parseItemsWithGson(String json) {
         List<PhotoItem> items = new ArrayList<>();
-        PhotoResult result = new Gson().fromJson(json, PhotoResult.class);
-        List<PhotoResult.PhotosBean.PhotoBean> photolist = result.photos.photo;
+        PhotoRecent result = new Gson().fromJson(json, PhotoRecent.class);
+        List<PhotoRecent.PhotosBean.PhotoBean> photolist = result.photos.photo;
         for (int i = 0; i < photolist.size(); i++) {
             PhotoItem item = new PhotoItem();
             item.setCaption(photolist.get(i).title);

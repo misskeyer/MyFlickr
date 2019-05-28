@@ -1,4 +1,4 @@
-package com.example.chars.photocollection.modle;
+package com.example.chars.photocollection.network;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,7 +8,6 @@ import android.os.Message;
 import android.util.Log;
 import android.util.LruCache;
 
-import com.example.chars.photocollection.modle.FlickrFetchr;
 import com.example.chars.photocollection.util.BitmapUtils;
 
 import java.io.IOException;

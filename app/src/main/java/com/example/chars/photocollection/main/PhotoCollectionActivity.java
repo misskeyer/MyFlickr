@@ -1,4 +1,4 @@
-package com.example.chars.photocollection.ui;
+package com.example.chars.photocollection.main;
 
 import android.content.Context;
 import android.content.Intent;
@@ -17,12 +17,11 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.example.chars.photocollection.R;
-import com.example.chars.photocollection.ui.adapter.FragmentAdapter;
+import com.example.chars.photocollection.main.adapter.FragmentAdapter;
 
 import java.util.ArrayList;
 import java.util.List;

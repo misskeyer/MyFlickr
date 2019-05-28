@@ -1,9 +1,11 @@
-package com.example.chars.photocollection.ui;
+package com.example.chars.photocollection.main;
 
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
+
+import com.example.chars.photocollection.common.basic.abstarctRootActivity;
 
 public class PhotoPageActivity extends abstarctRootActivity {
 

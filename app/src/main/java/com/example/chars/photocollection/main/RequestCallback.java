@@ -1,7 +1,7 @@
-package com.example.chars.photocollection.ui;
+package com.example.chars.photocollection.main;
 
-import com.example.chars.photocollection.modle.data.PhotoItem;
-import com.example.chars.photocollection.modle.data.PhotoResult;
+import com.example.chars.photocollection.common.data.PhotoItem;
+import com.example.chars.photocollection.network.json.PhotoRecent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ public class RequestCallback implements PhotoCollectionFragment.RequestPhotoCall
     private static final String TAG = "RequestCallback";
 
     @Override
-    public void requestSuccess(PhotoCollectionFragment fragment , List<PhotoResult.PhotosBean
+    public void requestSuccess(PhotoCollectionFragment fragment , List<PhotoRecent.PhotosBean
             .PhotoBean> list) {
         List<PhotoItem> items = new ArrayList<>();
 

@@ -1,4 +1,4 @@
-package com.example.chars.photocollection.ui;
+package com.example.chars.photocollection.common.basic;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

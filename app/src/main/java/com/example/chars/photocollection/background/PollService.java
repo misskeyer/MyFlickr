@@ -19,9 +19,9 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 import com.example.chars.photocollection.R;
-import com.example.chars.photocollection.modle.data.PhotoItem;
-import com.example.chars.photocollection.modle.FlickrFetchr;
-import com.example.chars.photocollection.ui.PhotoCollectionActivity;
+import com.example.chars.photocollection.common.data.PhotoItem;
+import com.example.chars.photocollection.network.FlickrFetchr;
+import com.example.chars.photocollection.main.PhotoCollectionActivity;
 import com.example.chars.photocollection.util.QueryPreferences;
 
 import java.util.List;

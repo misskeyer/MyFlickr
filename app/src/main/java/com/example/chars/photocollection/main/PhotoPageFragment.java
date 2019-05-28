@@ -1,4 +1,4 @@
-package com.example.chars.photocollection.ui;
+package com.example.chars.photocollection.main;
 
 import android.annotation.SuppressLint;
 import android.net.Uri;
@@ -16,8 +16,7 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
 import com.example.chars.photocollection.R;
-
-import java.util.Objects;
+import com.example.chars.photocollection.common.basic.VisibleFragment;
 
 public class PhotoPageFragment extends VisibleFragment {
     private static final String ARG_URI = "photo_page_uri";
