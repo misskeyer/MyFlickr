@@ -77,7 +77,6 @@ public class ImageHelper {
                     .listener(new SetEnableListener(view));
 
             int[] size = photoItem.getRegularSize(context);
-//            int[] size = view.getSize();
             Log.i(TAG, "size1: " + size[0] + "  size2: " + size[1]);
             Log.i(TAG, photoItem.getUrl());
             Glide.with(context)

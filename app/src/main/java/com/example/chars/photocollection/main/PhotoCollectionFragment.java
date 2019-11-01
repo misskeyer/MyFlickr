@@ -159,7 +159,6 @@ public class PhotoCollectionFragment extends VisibleFragment implements SwipeRef
     @Override
     public void onRefresh() {
         updateItems();
-        mRefreshLayout.setRefreshing(false);
     }
 
     @Override
@@ -244,6 +243,8 @@ public class PhotoCollectionFragment extends VisibleFragment implements SwipeRef
     public void init(List<PhotoItem> items) {
         this.items = items;
         setupAdapter();
+        if (mRefreshLayout != null)
+            mRefreshLayout.setRefreshing(false);
     }
 
     private class FetchItemTask extends AsyncTask<Void, Void, List<PhotoItem>> {

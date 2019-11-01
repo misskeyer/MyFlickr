@@ -44,18 +44,8 @@ public class PhotoService {
         options.put("nojsoncallback", "1");
     }
 
-    public PhotoService() {
-        mCompositeDisposable = new CompositeDisposable();
-
-        options.put("api_key", BuildConfig.FLICKR_API_KEY);
-        options.put("format", "json");
-        options.put("nojsoncallback", "1");
-    }
-
-
     public void requestRecentPhotos(List<PhotoItem> List) {
-        Disposable disposable = PhotoCollection.getInstance().getApi()
-                .getRecentPhoto(options)
+        Disposable disposable = api.getRecentPhoto(options)
                 .compose(SchedulerTransformer.create())
                 .subscribe(new Consumer<PhotoRecent>() {
                     @Override

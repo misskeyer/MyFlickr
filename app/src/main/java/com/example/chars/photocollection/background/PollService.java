@@ -31,8 +31,8 @@ public class PollService extends IntentService {
     private static final String CHANNEL_ID = "channel_pollservice";
     private static final int POLL_INTERVAL = 1000 * 60;
 
-    public static final String ACTION_SHOW_NOTIFICATION = "com.example.chars.photocollection.show_notification";
-    public static final String PERM_PRIVATE = "com.example.chars.photocollection.private";
+    public static final String ACTION_SHOW_NOTIFICATION = "com.example.chars.myflickr.show_notification";
+    public static final String PERM_PRIVATE = "com.example.chars.myflickr.private";
     public static final String REQUEST_CODE = "REQUEST_CODE";
     public static final String NOTIFICATION = "NOTIFICATION";
 
